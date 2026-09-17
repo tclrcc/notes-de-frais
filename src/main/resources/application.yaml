@@ -1,0 +1,33 @@
+spring:
+  application:
+    name: notes-de-frais
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/notesdefrais
+    username: ndf
+    password: ${NDF_DB_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+
+  kafka:
+    bootstrap-servers: localhost:19092
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+
+logging:
+  level:
+    fr.coloricchio.notesdefrais: DEBUG
+    org.hibernate.SQL: DEBUG
