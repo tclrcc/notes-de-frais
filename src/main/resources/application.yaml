@@ -24,6 +24,15 @@ spring:
 
   kafka:
     bootstrap-servers: localhost:19092
+    producer:
+      acks: all # message répliqué avant acquittement
+      properties:
+        enable.idempotence: true # évite les doublons
+    consumer:
+      group-id: notes-de-frais
+      auto-offset-reset: earliest
+    listener:
+      ack-mode: record
 
 management:
   endpoints:
