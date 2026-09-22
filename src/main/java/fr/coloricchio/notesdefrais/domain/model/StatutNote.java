@@ -4,6 +4,11 @@ import java.util.EnumSet;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Etats d'une note de frais et transitions autorisées.
+ * La machine à états est déclarée ici plutot que dans un service
+ * L'agrégat interroge {@link #peutAllerVers(StatutNote)} et refuse ce qui n'est pas déclaré.
+ */
 public enum StatutNote {
 
     BROUILLON,

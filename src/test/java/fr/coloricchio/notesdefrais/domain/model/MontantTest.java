@@ -35,4 +35,11 @@ class MontantTest {
     void egalite() {
         assertThat(Montant.de("10.00")).isEqualTo(Montant.de("10.00"));
     }
+
+    @Test
+    @DisplayName("deux montants de même valeur mais d'échelle différente sont égaux")
+    void egaliteIndependanteDeLEchelle() {
+        assertThat(Montant.de("10.0")).isEqualTo(Montant.de("10.00"));
+        assertThat(Montant.de("10.0")).hasSameHashCodeAs(Montant.de("10.00"));
+    }
 }

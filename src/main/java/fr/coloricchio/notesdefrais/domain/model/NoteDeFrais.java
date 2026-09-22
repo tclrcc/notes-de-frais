@@ -3,7 +3,6 @@ package fr.coloricchio.notesdefrais.domain.model;
 import fr.coloricchio.notesdefrais.domain.exception.*;
 
 import java.time.Instant;
-import java.time.Period;
 import java.util.*;
 
 /**
@@ -51,7 +50,8 @@ public class NoteDeFrais {
         NoteDeFrais note = new NoteDeFrais(id, reference, collaborateurId,
                 periode, creeeLe, statut);
         note.soumiseLe = soumiseLe;
-        note.lignes.addAll(lignes);
+        // figer le contenu au moment de l'appel
+        note.lignes.addAll(List.copyOf(lignes));
         return note;
     }
 
@@ -123,10 +123,18 @@ public class NoteDeFrais {
                 .reduce(Montant.ZERO, Montant::plus);
     }
 
+    /**
+     * Les évènements produits depuis la dernière publication
+     * l'appelant ne peut pas vider la liste interne
+     */
     public List<EvenementNote> evenementsNonPublies() {
         return List.copyOf(evenements);
     }
 
+    /**
+     * Vide le tampon d'évènements après publication
+     * Appelé par la couche application, une fois la publication acquittée
+     */
     public void marquerEvenementsPublies() {
         evenements.clear();
     }

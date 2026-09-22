@@ -28,6 +28,8 @@ public record Montant(BigDecimal valeur) implements Comparable<Montant> {
         return new Montant(valeur.add(autre.valeur));
     }
 
+    public Montant moins(Montant autre) {return new Montant(valeur.subtract(autre.valeur));}
+
     public boolean estSuperieurA(Montant autre) {
         return valeur.compareTo(autre.valeur) > 0;
     }
