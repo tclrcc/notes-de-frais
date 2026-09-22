@@ -1,0 +1,132 @@
+### Créer une note de frais
+POST http://localhost:8080/api/notes-de-frais
+Content-Type: application/json
+
+{
+  "collaborateurId": "22222222-2222-2222-2222-222222222222",
+  "annee": 2026,
+  "mois": 9
+}
+
+> {% client.global.set("noteId", response.body.id); %}
+
+### Lire la note
+GET http://localhost:8080/api/notes-de-frais/{{noteId}}
+
+### Ajouter une ligne (péage, sans plafond)
+POST http://localhost:8080/api/notes-de-frais/{{noteId}}/lignes
+Content-Type: application/json
+
+{
+  "codeCategorie": "PEAGE",
+  "dateDepense": "2026-09-10",
+  "montantTtc": 12.50,
+  "tva": 0,
+  "libelle": "Péage A42",
+  "justificatifFourni": false
+}
+
+### Ajouter un repas valide (25 € de plafond, justificatif fourni)
+POST http://localhost:8080/api/notes-de-frais/{{noteId}}/lignes
+Content-Type: application/json
+
+{
+  "codeCategorie": "REPAS",
+  "dateDepense": "2026-09-12",
+  "montantTtc": 22.00,
+  "tva": 2.20,
+  "libelle": "Déjeuner client",
+  "justificatifFourni": true
+}
+
+### ❌ Plafond dépassé → 422
+POST http://localhost:8080/api/notes-de-frais/{{noteId}}/lignes
+Content-Type: application/json
+
+{
+  "codeCategorie": "REPAS",
+  "dateDepense": "2026-09-13",
+  "montantTtc": 42.00,
+  "tva": 4.20,
+  "libelle": "Restaurant",
+  "justificatifFourni": true
+}
+
+### ❌ Justificatif manquant → 422
+POST http://localhost:8080/api/notes-de-frais/{{noteId}}/lignes
+Content-Type: application/json
+
+{
+  "codeCategorie": "REPAS",
+  "dateDepense": "2026-09-14",
+  "montantTtc": 18.00,
+  "tva": 1.80,
+  "libelle": "Déjeuner",
+  "justificatifFourni": false
+}
+
+### ❌ Date hors période → 422
+POST http://localhost:8080/api/notes-de-frais/{{noteId}}/lignes
+Content-Type: application/json
+
+{
+  "codeCategorie": "PEAGE",
+  "dateDepense": "2026-08-25",
+  "montantTtc": 9.00,
+  "tva": 0,
+  "libelle": "Péage août",
+  "justificatifFourni": false
+}
+
+### ❌ Validation invalide → 400
+POST http://localhost:8080/api/notes-de-frais/{{noteId}}/lignes
+Content-Type: application/json
+
+{
+  "codeCategorie": "",
+  "dateDepense": "2027-01-01",
+  "montantTtc": -5,
+  "tva": 0,
+  "libelle": "",
+  "justificatifFourni": false
+}
+
+### Soumettre
+POST http://localhost:8080/api/notes-de-frais/{{noteId}}/soumission
+
+### ❌ Note soumise, plus modifiable → 409
+POST http://localhost:8080/api/notes-de-frais/{{noteId}}/lignes
+Content-Type: application/json
+
+{
+  "codeCategorie": "PEAGE",
+  "dateDepense": "2026-09-15",
+  "montantTtc": 8.00,
+  "tva": 0,
+  "libelle": "Péage retour",
+  "justificatifFourni": false
+}
+
+### Valider
+POST http://localhost:8080/api/notes-de-frais/{{noteId}}/validation
+Content-Type: application/json
+
+{ "decideurId": "11111111-1111-1111-1111-111111111111" }
+
+### ❌ Transition interdite → 409
+POST http://localhost:8080/api/notes-de-frais/{{noteId}}/validation
+Content-Type: application/json
+
+{ "decideurId": "11111111-1111-1111-1111-111111111111" }
+
+### Rembourser
+POST http://localhost:8080/api/notes-de-frais/{{noteId}}/remboursement
+Content-Type: application/json
+
+{ "decideurId": "33333333-3333-3333-3333-333333333333" }
+
+### Lister les notes du collaborateur
+GET http://localhost:8080/api/notes-de-frais?collaborateurId=22222222-2222-2222-2222-222222222222
+
+### ❌ Note inexistante → 404
+GET http://localhost:8080/api/notes-de-frais/00000000-0000-0000-0000-000000000000
