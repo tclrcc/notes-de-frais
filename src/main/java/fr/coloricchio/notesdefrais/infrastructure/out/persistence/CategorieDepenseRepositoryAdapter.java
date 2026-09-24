@@ -4,6 +4,7 @@ import fr.coloricchio.notesdefrais.domain.model.CategorieDepense;
 import fr.coloricchio.notesdefrais.domain.port.out.CategorieDepenseRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -18,5 +19,12 @@ public class CategorieDepenseRepositoryAdapter implements CategorieDepenseReposi
     @Override
     public Optional<CategorieDepense> parCode(String code) {
         return jpa.findByCode(code).map(NoteDeFraisMapper::versDomaine);
+    }
+
+    @Override
+    public List<CategorieDepense> toutes() {
+        return jpa.findAll().stream()
+                .map(NoteDeFraisMapper::versDomaine)
+                .toList();
     }
 }

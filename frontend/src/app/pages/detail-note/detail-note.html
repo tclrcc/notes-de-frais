@@ -1,0 +1,128 @@
+<nav class="fil">
+  <a routerLink="/">Retour aux notes</a>
+</nav>
+
+@if (chargement() && !note()) {
+  <p class="info">Chargement...</p>
+}
+
+@if (erreur(); as message) {
+  <div class="bandeau bandeau--erreur" role="alert">
+    <strong>Action refusée</strong>
+    <p>{{ message }}</p>
+  </div>
+}
+
+@if (succes(); as message) {
+  <div class="bandeau bandeau--succes" role="status">{{ message }}</div>
+}
+
+@if (note(); as n) {
+  <header class="entete">
+    <div>
+      <h1>{{ n.reference }}</h1>
+      <p class="meta">
+        Période {{ n.periode }} · créée le {{ n.creeeLe | date:'dd/MM/yyyy & HH:mm' }}
+        @if (n.soumiseLe) {
+          · soumise le {{ n.soumiseLe | date:'dd/MM/yyyy à HH:mm' }}
+        }
+      </p>
+    </div>
+    <span [class]="classeStatut(n.statut)">{{ n.statut }}</span>
+  </header>
+
+  <section class="total">
+    <span>{{ nombreLignes() }} ligne{{ nombreLignes() > 1 ? 's' : '' }}</span>
+    <strong>{{ n.montantTotal | currency:'EUR' }}</strong>
+  </section>
+
+  <section class="actions">
+    @if (peutSoumettre()) {
+      <button type="button" class="primaire" (click)="soumettre()" [disabled]="chargement()">
+        Soumettre
+      </button>
+    } @else if (peutModifier()) {
+      <p class="info">Ajoutez au moins une ligne pour pouvoir soumettre.</p>
+    }
+
+    @if (peutDecider()) {
+      <button type="button" class="primaire" (click)="valider()" [disabled]="chargement()">
+        Valider
+      </button>
+      <button type="button" class="danger" (click)="basculerFormulaireRejet()" [disabled]="chargement()">
+        Rejeter
+      </button>
+    }
+
+    @if (peutRembourser()) {
+      <button type="button" class="primaire" (click)="rembourser()" [disabled]="chargement()">
+        Marquer comme remboursée
+      </button>
+    }
+
+    @if (estTerminee()) {
+      <p class="info">Cette note est remboursée. Aucune action n'est possible.</p>
+    }
+  </section>
+
+  @if (formulaireRejetVisible()) {
+    <section class="rejet">
+      <label for="motif">Motif du rejet</label>
+      <textarea
+        id="motif"
+        rows="3"
+        [value]="motifRejet()"
+        (input)="majMotif($event)"
+        placeholder="Justificatif illisible, dépense hors politique…"></textarea>
+      <div class="rejet__actions">
+        <button type="button" class="danger" (click)="confirmerRejet()" [disabled]="chargement()">
+          Confirmer le rejet
+        </button>
+        <button type="button" class="neutre" (click)="basculerFormulaireRejet()">
+          Annuler
+        </button>
+      </div>
+    </section>
+  }
+
+@if (peutModifier()) {
+  <app-formulaire-ligne
+    [noteId]="n.id"
+    [periode]="n.periode"
+    (ligneAjoutee)="surLigneAjoutee($event)" />
+}
+
+  <h2>Lignes de dépense</h2>
+
+  @if (n.lignes.length > 0) {
+    <table class="lignes">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Catégorie</th>
+          <th>Libellé</th>
+          <th class="droite">HT</th>
+          <th class="droite">TVA</th>
+          <th class="droite">TTC</th>
+          <th>Justificatif</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (ligne of n.lignes; track ligne.id) {
+          <tr>
+            <td>{{ ligne.dateDepense | date:'dd/MM/yyyy' }}</td>
+            <td>{{ ligne.categorie }}</td>
+            <td>{{ ligne.libelle }}</td>
+            <td class="droite">{{ ligne.montantHt | currency:'EUR' }}</td>
+            <td class="droite">{{ ligne.tva | currency:'EUR' }}</td>
+            <td class="droite"><strong>{{ ligne.montantTtc | currency:'EUR' }}</strong></td>
+            <td>{{ ligne.justificatifFourni ? 'Oui' : '—' }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  } @else {
+    <p class="vide">Aucune ligne pour l'instant.</p>
+  }
+
+}

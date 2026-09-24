@@ -1,0 +1,90 @@
+<form [formGroup]="formulaire" (ngSubmit)="soumettre()" class="formulaire">
+
+  <h3>Ajouter une ligne</h3>
+
+  @if (erreur(); as message) {
+  <div class="bandeau bandeau--erreur" role="alert">
+    <strong>Ligne refusée</strong>
+    <p>{{ message }}</p>
+  </div>
+  }
+
+  <div class="grille">
+    <div class="champ">
+      <label for="categorie">Catégorie</label>
+      <select id="categorie" formControlName="codeCategorie">
+        <option value="">— Choisir —</option>
+        @for (categorie of categories(); track categorie.code) {
+        <option [value]="categorie.code">{{ categorie.libelle }}</option>
+        }
+      </select>
+      @if (enErreur('codeCategorie')) {
+      <span class="aide aide--erreur">La catégorie est obligatoire.</span>
+      }
+    </div>
+
+    <div class="champ">
+      <label for="date">Date de dépense</label>
+      <input
+        id="date"
+        type="date"
+        formControlName="dateDepense"
+        [min]="dateMin()"
+        [max]="dateMax()">
+      @if (enErreur('dateDepense')) {
+      <span class="aide aide--erreur">La date est obligatoire.</span>
+      }
+      <span class="aide">Doit appartenir à la période {{ periode() }}.</span>
+    </div>
+
+    <div class="champ">
+      <label for="ttc">Montant TTC (€)</label>
+      <input id="ttc" type="number" step="0.01" min="0.01" formControlName="montantTtc">
+      @if (enErreur('montantTtc')) {
+      <span class="aide aide--erreur">Le montant doit être strictement positif.</span>
+      }
+    </div>
+
+    <div class="champ">
+      <label for="tva">TVA (€)</label>
+      <input id="tva" type="number" step="0.01" min="0" formControlName="tva">
+    </div>
+
+    <div class="champ champ--large">
+      <label for="libelle">Libellé</label>
+      <input id="libelle" type="text" maxlength="255" formControlName="libelle"
+             placeholder="Déjeuner client, péage A42…">
+      @if (enErreur('libelle')) {
+      <span class="aide aide--erreur">Le libellé est obligatoire.</span>
+      }
+    </div>
+
+    <div class="champ champ--case">
+      <label>
+        <input type="checkbox" formControlName="justificatifFourni">
+        Justificatif fourni
+      </label>
+    </div>
+  </div>
+
+  @if (categorieCourante(); as categorie) {
+  <div class="contraintes">
+    @if (categorie.plafondUnitaire !== null) {
+    <span class="puce">Plafond : {{ categorie.plafondUnitaire | currency:'EUR' }}</span>
+    } @else {
+    <span class="puce">Aucun plafond</span>
+    }
+    @if (categorie.justificatifObligatoire) {
+    <span class="puce puce--alerte">Justificatif obligatoire</span>
+    }
+  </div>
+  }
+
+  @if (formulaire.errors?.['tvaSuperieureAuTtc']) {
+  <p class="aide aide--erreur">La TVA ne peut pas excéder le montant TTC.</p>
+  }
+
+  <button type="submit" class="primaire" [disabled]="envoiEnCours()">
+    {{ envoiEnCours() ? 'Ajout…' : 'Ajouter la ligne' }}
+  </button>
+</form>

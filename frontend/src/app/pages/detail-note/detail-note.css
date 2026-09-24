@@ -1,0 +1,92 @@
+:host {
+  display: block;
+  max-width: 60rem;
+  margin: 2rem auto;
+  padding: 0 1rem;
+  font-family: system-ui, sans-serif;
+  color: #1a1a1a;
+}
+
+.fil { margin-bottom: 1rem; }
+.fil a { color: #0e6e72; text-decoration: none; font-size: .9rem; }
+.fil a:hover { text-decoration: underline; }
+
+.entete {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 2px solid #0e6e72;
+  padding-bottom: .75rem;
+}
+h1 { font-size: 1.5rem; margin: 0 0 .25rem; }
+h2 { font-size: 1.1rem; margin: 2rem 0 .5rem; }
+.meta { color: #666; font-size: .85rem; margin: 0; }
+
+.total {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  background: #f7f9f9;
+  padding: .75rem 1rem;
+  margin-top: 1rem;
+  border-radius: 4px;
+}
+.total strong { font-size: 1.3rem; color: #0e6e72; }
+
+.actions { display: flex; gap: .5rem; align-items: center; margin-top: 1.25rem; flex-wrap: wrap; }
+
+button {
+  border: 0;
+  border-radius: 4px;
+  padding: .55rem 1.1rem;
+  cursor: pointer;
+  font-size: .9rem;
+  color: #fff;
+}
+button:disabled { opacity: .5; cursor: not-allowed; }
+.primaire { background: #0e6e72; }
+.danger   { background: #c53030; }
+.neutre   { background: #888; }
+
+.bandeau { padding: .75rem 1rem; margin: 1rem 0; border-radius: 4px; }
+.bandeau--erreur { background: #fdf2f2; border-left: 4px solid #c53030; }
+.bandeau--erreur p { margin: .25rem 0 0; }
+.bandeau--succes { background: #f0f9f4; border-left: 4px solid #2f855a; color: #22543d; }
+
+.rejet {
+  background: #fdf2f2;
+  padding: 1rem;
+  border-radius: 4px;
+  margin-top: 1rem;
+}
+.rejet label { display: block; font-size: .85rem; font-weight: 600; margin-bottom: .35rem; }
+.rejet textarea {
+  width: 100%;
+  padding: .5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: .9rem;
+  box-sizing: border-box;
+}
+.rejet__actions { display: flex; gap: .5rem; margin-top: .6rem; }
+
+table.lignes { width: 100%; border-collapse: collapse; }
+th, td { text-align: left; padding: .6rem .5rem; border-bottom: 1px solid #e5e5e5; }
+th { font-size: .78rem; text-transform: uppercase; letter-spacing: .05em; color: #666; }
+.droite { text-align: right; }
+
+.info, .vide { color: #666; font-style: italic; font-size: .9rem; }
+
+.statut {
+  display: inline-block;
+  padding: .2rem .65rem;
+  border-radius: 999px;
+  font-size: .75rem;
+  font-weight: 600;
+}
+.statut--brouillon  { background: #eee;    color: #555; }
+.statut--soumise    { background: #fff3cd; color: #856404; }
+.statut--validee    { background: #d4edda; color: #155724; }
+.statut--rejetee    { background: #f8d7da; color: #721c24; }
+.statut--remboursee { background: #d1ecf1; color: #0c5460; }

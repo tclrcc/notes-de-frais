@@ -1,0 +1,52 @@
+<header class="entete">
+  <h1>Mes notes de frais</h1>
+  <button type="button" (click)="creerNote()" [disabled]="chargement()">
+    Nouvelle note
+  </button>
+</header>
+
+@if (chargement()) {
+  <p class="info">Chargement...</p>
+}
+
+@if (erreur(); as message) {
+  <div class="erreur" role="alert">
+    <strong>Erreur</strong>
+    <p>{{ message }}</p>
+    <button type="button" (click)="charger()">Réessayer</button>
+  </div>
+}
+
+@if (aDesNotes()) {
+  <p class="resume">
+    {{ nombreNotes() }} note{{ nombreNotes() > 1 ? 's' : '' }} -
+    total {{ montantCumule() | currency:'EUR' }}
+  </p>
+
+  <table class="notes">
+    <thead>
+      <tr>
+        <th>Référence</th>
+        <th>Période</th>
+        <th>Statut</th>
+        <th>Lignes</th>
+        <th class="droite">Montant</th>
+        <th>Créée le</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (note of notes(); track note.id) {
+        <tr>
+          <td><a [routerLink]="['/notes', note.id]">{{ note.reference }}</a>/td>
+          <td>{{ note.periode }}</td>
+          <td><span [class]="classeStatut(note.statut)">{{ note.statut }}</span></td>
+          <td>{{ note.lignes.length }}</td>
+          <td class="droite">{{ note.montantTotal | currency:'EUR' }}</td>
+          <td>{{ note.creeeLe | date:'dd/MM/yyyy HH:mm' }}</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+} @else if (!chargement() && !erreur()) {
+  <p class="vide">Aucune note de frais. Créez-en une pour commencer.</p>
+}
