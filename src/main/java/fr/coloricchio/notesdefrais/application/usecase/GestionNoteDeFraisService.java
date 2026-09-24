@@ -1,16 +1,14 @@
 package fr.coloricchio.notesdefrais.application.usecase;
 
 import fr.coloricchio.notesdefrais.domain.exception.CategorieIntrouvable;
+import fr.coloricchio.notesdefrais.domain.exception.CollaborateurIntrouvable;
 import fr.coloricchio.notesdefrais.domain.exception.NoteIntrouvable;
 import fr.coloricchio.notesdefrais.domain.model.CategorieDepense;
 import fr.coloricchio.notesdefrais.domain.model.LigneDeFrais;
 import fr.coloricchio.notesdefrais.domain.model.Montant;
 import fr.coloricchio.notesdefrais.domain.model.NoteDeFrais;
 import fr.coloricchio.notesdefrais.domain.port.in.*;
-import fr.coloricchio.notesdefrais.domain.port.out.CategorieDepenseRepository;
-import fr.coloricchio.notesdefrais.domain.port.out.GenerateurReference;
-import fr.coloricchio.notesdefrais.domain.port.out.NoteDeFraisRepository;
-import fr.coloricchio.notesdefrais.domain.port.out.PublicateurEvenements;
+import fr.coloricchio.notesdefrais.domain.port.out.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,15 +22,17 @@ public class GestionNoteDeFraisService implements AjouterLigne, CreerNote, Decid
 
     private final NoteDeFraisRepository notes;
     private final CategorieDepenseRepository categories;
+    private final CollaborateurRepository collaborateurs;
     private final PublicateurEvenements evenements;
     private final GenerateurReference references;
     private final Clock horloge;
 
-    public GestionNoteDeFraisService(NoteDeFraisRepository notes, CategorieDepenseRepository categories,
+    public GestionNoteDeFraisService(NoteDeFraisRepository notes, CategorieDepenseRepository categories, CollaborateurRepository collaborateurs,
                                      PublicateurEvenements evenements, GenerateurReference references,
                                      Clock horloge) {
         this.notes = notes;
         this.categories = categories;
+        this.collaborateurs = collaborateurs;
         this.evenements = evenements;
         this.references = references;
         this.horloge = horloge;
@@ -41,6 +41,10 @@ public class GestionNoteDeFraisService implements AjouterLigne, CreerNote, Decid
     @Override
     @Transactional
     public UUID executer(CreerNoteCommande commande) {
+        if (collaborateurs.parId(commande.collaborateurId()).isEmpty()) {
+            throw new CollaborateurIntrouvable(commande.collaborateurId());
+        }
+
         NoteDeFrais note = NoteDeFrais.creer(
             UUID.randomUUID(),
             references.pour(commande.periode()),

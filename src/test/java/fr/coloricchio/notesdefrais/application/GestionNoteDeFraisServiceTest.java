@@ -22,6 +22,7 @@ class GestionNoteDeFraisServiceTest {
 
     private NotesEnMemoire notes;
     private CategoriesEnMemoire categories;
+    private CollaborateursEnMemoire collaborateurs;
     private PublicateurEspion publicateur;
     private GestionNoteDeFraisService service;
 
@@ -29,11 +30,19 @@ class GestionNoteDeFraisServiceTest {
     void setUp() {
         notes = new NotesEnMemoire();
         categories = new CategoriesEnMemoire();
+        collaborateurs = new CollaborateursEnMemoire();
         publicateur = new PublicateurEspion();
+
         categories.ajouter(new CategorieDepense(
                 UUID.randomUUID(), "PEAGE", "Péage", null, false));
+
+        collaborateurs.ajouter(new Collaborateur(MANAGER, "marie.dubois@exemple.fr",
+                "Dubois", "Marie", RoleCollaborateur.MANAGER, null));
+        collaborateurs.ajouter(new Collaborateur(COLLABORATEUR, "tony.coloricchio@exemple.fr",
+                "Coloricchio", "Tony", RoleCollaborateur.COLLABORATEUR, MANAGER));
+
         service = new GestionNoteDeFraisService(
-                notes, categories, publicateur, new ReferenceFixe(), HORLOGE);
+                notes, categories, collaborateurs, publicateur, new ReferenceFixe(), HORLOGE);
     }
 
     private UUID creerNoteAvecUneLigne() {
@@ -54,6 +63,16 @@ class GestionNoteDeFraisServiceTest {
             assertThat(note.reference()).isEqualTo("NDF-TEST-001");
             assertThat(note.creeeLe()).isEqualTo(Instant.parse("2026-09-18T10:00:00Z"));
         });
+    }
+
+    @Test
+    @DisplayName("créer une note pour un collaborateur inconnu échoue")
+    void collaborateurInconnu() {
+        assertThatThrownBy(() -> service.executer(
+                new CreerNoteCommande(UUID.randomUUID(), Periode.de(2026, 9))))
+                .isInstanceOf(CollaborateurIntrouvable.class);
+
+        assertThat(notes.stockage).isEmpty();
     }
 
     @Test

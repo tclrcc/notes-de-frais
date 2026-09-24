@@ -34,6 +34,18 @@ class CategoriesEnMemoire implements CategorieDepenseRepository {
     public List<CategorieDepense> toutes() {return List.copyOf(stockage.values());}
 }
 
+class CollaborateursEnMemoire implements CollaborateurRepository {
+    final Map<UUID, Collaborateur> stockage = new LinkedHashMap<>();
+
+    void ajouter(Collaborateur c) {stockage.put(c.id(), c);}
+
+    @Override
+    public Optional<Collaborateur> parId(UUID id) {return Optional.ofNullable(stockage.get(id));}
+
+    @Override
+    public List<Collaborateur> tous() {return List.copyOf(stockage.values());}
+}
+
 class PublicateurEspion implements PublicateurEvenements {
     final List<EvenementNote> publies = new ArrayList<>();
 

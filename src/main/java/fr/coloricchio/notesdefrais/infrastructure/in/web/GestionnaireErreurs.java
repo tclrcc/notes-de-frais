@@ -33,6 +33,11 @@ public class GestionnaireErreurs {
         return probleme(HttpStatus.CONFLICT, "Note non modifiable", e.getMessage(), "note-non-modifiable");
     }
 
+    @ExceptionHandler(CollaborateurIntrouvable.class)
+    public ProblemDetail collaborateurIntrouvable(CollaborateurIntrouvable e) {
+        return probleme(HttpStatus.BAD_REQUEST, "Collaborateur inconnu", e.getMessage(), "collaborateur-introuvable");
+    }
+
     /** Toutes les autres violations de règles métier */
     @ExceptionHandler(RegleMetierViolee.class)
     public ProblemDetail regleMetier(RegleMetierViolee e) {
