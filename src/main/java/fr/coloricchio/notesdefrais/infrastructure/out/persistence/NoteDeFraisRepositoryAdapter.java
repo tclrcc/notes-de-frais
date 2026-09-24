@@ -5,7 +5,6 @@ import fr.coloricchio.notesdefrais.domain.model.NoteDeFrais;
 import fr.coloricchio.notesdefrais.domain.port.out.NoteDeFraisRepository;
 import org.springframework.stereotype.Repository;
 
-import java.awt.*;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;

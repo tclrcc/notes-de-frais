@@ -37,7 +37,7 @@
     <tbody>
       @for (note of notes(); track note.id) {
         <tr>
-          <td><a [routerLink]="['/notes', note.id]">{{ note.reference }}</a>/td>
+          <td><a [routerLink]="['/notes', note.id]">{{ note.reference }}</a></td>
           <td>{{ note.periode }}</td>
           <td><span [class]="classeStatut(note.statut)">{{ note.statut }}</span></td>
           <td>{{ note.lignes.length }}</td>
