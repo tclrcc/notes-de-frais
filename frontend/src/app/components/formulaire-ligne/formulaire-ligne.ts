@@ -7,7 +7,7 @@ import {
 import { NoteDeFraisService } from '../../services/note-de-frais';
 import { CategorieDepense, NoteDeFrais, ProblemDetail } from '../../models/note-de-frais';
 
-/** la TVA ne peut pas excéder le montant TTC */
+/** La TVA ne peut pas excéder le montant TTC — même règle que dans le domaine Java. */
 function tvaCoherente(groupe: AbstractControl): ValidationErrors | null {
   const ttc = groupe.get('montantTtc')?.value;
   const tva = groupe.get('tva')?.value;
@@ -16,7 +16,7 @@ function tvaCoherente(groupe: AbstractControl): ValidationErrors | null {
 }
 
 @Component({
-  imports: [],
+  imports: [ReactiveFormsModule, CurrencyPipe],
   selector: 'app-formulaire-ligne',
   styleUrl: './formulaire-ligne.css',
   templateUrl: './formulaire-ligne.html',
@@ -46,7 +46,7 @@ export class FormulaireLigne implements OnInit {
     justificatifFourni: [false]
   }, { validators: tvaCoherente });
 
-  /** Catégorie couramment sélectionnée, pour afficher ses contraintes */
+  /** Catégorie couramment sélectionnée, pour afficher ses contraintes. */
   protected readonly categorieCourante = computed(() =>
     this.categories().find(c => c.code === this.codeSelectionne()) ?? null
   );
@@ -59,10 +59,10 @@ export class FormulaireLigne implements OnInit {
     return `${this.periode()}-${String(dernierJour).padStart(2, '0')}`;
   });
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.service.listerCategories().subscribe({
       next: cats => this.categories.set(cats),
-      error: () => this.erreur.set('Impossible de charger les catégories')
+      error: () => this.erreur.set('Impossible de charger les catégories.')
     });
 
     this.formulaire.controls.codeCategorie.valueChanges.subscribe(code =>
@@ -70,7 +70,7 @@ export class FormulaireLigne implements OnInit {
     );
   }
 
-  protected soumettre() {
+  protected soumettre(): void {
     if (this.formulaire.invalid) {
       this.formulaire.markAllAsTouched();
       return;
@@ -82,7 +82,7 @@ export class FormulaireLigne implements OnInit {
     this.service.ajouterLigne(this.noteId(), this.formulaire.getRawValue()).subscribe({
       next: note => {
         this.ligneAjoutee.emit(note);
-        this.formulaire.reset({ montantTtc: 0, tva: 0, justificatifFourni: false});
+        this.formulaire.reset({ montantTtc: 0, tva: 0, justificatifFourni: false });
         this.codeSelectionne.set('');
         this.envoiEnCours.set(false);
       },
