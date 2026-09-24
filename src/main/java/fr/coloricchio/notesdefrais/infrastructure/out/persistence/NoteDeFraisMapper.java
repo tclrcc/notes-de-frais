@@ -31,6 +31,16 @@ final class NoteDeFraisMapper {
                 e.getSoumiseLe(), lignes);
     }
 
+    static Collaborateur versDomaine(CollaborateurEntity e) {
+        return new Collaborateur(
+                e.getId(),
+                e.getEmail(),
+                e.getNom(),
+                e.getPrenom(),
+                RoleCollaborateur.valueOf(e.getRole()),
+                e.getManagerId());
+    }
+
     static LocalDate versColonne(Periode periode) {
         return periode.valeur().atDay(1);
     }
