@@ -1,8 +1,10 @@
 import { Component, computed, inject, input, signal, OnInit } from '@angular/core';
-import { CurrencyPipe, DatePipe} from '@angular/common';
+import { CurrencyPipe, DatePipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Router, RouterLink } from '@angular/router';
+import { Observable } from 'rxjs';
 import { NoteDeFraisService } from '../../services/note-de-frais';
+import { ActeurCourant } from '../../services/acteur-courant';
 import { FormulaireLigne } from '../../components/formulaire-ligne/formulaire-ligne';
 import { NoteDeFrais, ProblemDetail, StatutNote } from '../../models/note-de-frais';
 
@@ -19,9 +21,7 @@ export class DetailNote implements OnInit {
 
   private readonly service = inject(NoteDeFraisService);
   private readonly router = inject(Router);
-
-  private readonly managerId = '11111111-1111-1111-1111-111111111111';
-  private readonly comptableId = '33333333-3333-3333-3333-333333333333';
+  private readonly acteurCourant = inject(ActeurCourant);
 
   protected readonly note = signal<NoteDeFrais | null>(null);
   protected readonly chargement = signal(false);
@@ -33,21 +33,35 @@ export class DetailNote implements OnInit {
   protected readonly formulaireRejetVisible = signal(false);
 
   /**
-   * Actions disponibles selon l'état courant
-   * La machine à états du domaine est reflétée ici
-   * Mais le server reste l'autorité
+   * Actions disponibles selon l'état courant ET le rôle de l'acteur.
+   * Le serveur reste l'autorité : ces conditions ne servent qu'à
+   * éviter d'afficher des boutons voués à échouer.
    */
-  protected readonly peutModifier = computed(() => this.note()?.statut === 'BROUILLON');
-  protected readonly peutSoumettre = computed(() =>
-    this.note()?.statut === 'BROUILLON' && (this.note()?.lignes.length ?? 0) > 0
+  protected readonly estProprietaire = computed(() =>
+    this.note()?.collaborateurId === this.acteurCourant.acteur()?.id
   );
-  protected readonly peutDecider = computed(() => this.note()?.statut === 'SOUMISE');
-  protected readonly peutRembourser = computed(() => this.note()?.statut === 'VALIDEE');
+
+  protected readonly peutModifier = computed(() =>
+    this.note()?.statut === 'BROUILLON' && this.estProprietaire()
+  );
+
+  protected readonly peutSoumettre = computed(() =>
+    this.peutModifier() && (this.note()?.lignes.length ?? 0) > 0
+  );
+
+  protected readonly peutDecider = computed(() =>
+    this.note()?.statut === 'SOUMISE' && this.acteurCourant.estManager()
+  );
+
+  protected readonly peutRembourser = computed(() =>
+    this.note()?.statut === 'VALIDEE' && this.acteurCourant.estComptable()
+  );
+
   protected readonly estTerminee = computed(() => this.note()?.statut === 'REMBOURSEE');
 
   protected readonly nombreLignes = computed(() => this.note()?.lignes.length ?? 0);
 
-  ngOnInit(){
+  ngOnInit() {
     this.charger();
   }
 
@@ -60,17 +74,27 @@ export class DetailNote implements OnInit {
   }
 
   protected valider() {
-    this.executer(() => this.service.valider(this.id(), this.managerId), 'Note validée.');
+    const decideur = this.acteurCourant.acteur();
+    if (!decideur) {
+      return;
+    }
+    this.executer(() => this.service.valider(this.id(), decideur.id), 'Note validée.');
   }
 
   protected confirmerRejet() {
+    const decideur = this.acteurCourant.acteur();
     const motif = this.motifRejet().trim();
+
     if (!motif) {
       this.erreur.set('Le motif de rejet est obligatoire.');
       return;
     }
+    if (!decideur) {
+      return;
+    }
+
     this.executer(
-      () => this.service.rejeter(this.id(), this.managerId, motif),
+      () => this.service.rejeter(this.id(), decideur.id, motif),
       'Note rejetée.'
     );
     this.formulaireRejetVisible.set(false);
@@ -78,8 +102,12 @@ export class DetailNote implements OnInit {
   }
 
   protected rembourser() {
+    const comptable = this.acteurCourant.acteur();
+    if (!comptable) {
+      return;
+    }
     this.executer(
-      () => this.service.rembourser(this.id(), this.comptableId),
+      () => this.service.rembourser(this.id(), comptable.id),
       'Note remboursée.'
     );
   }
@@ -114,7 +142,7 @@ export class DetailNote implements OnInit {
    * Pas de MAJ optimiste : l'état est toujours celui que le domaine a validé
    */
   private executer(
-    appel: () => import('rxjs').Observable<NoteDeFrais>,
+    appel: () => Observable<NoteDeFrais>,
     messageSucces?: string
   ) {
     this.chargement.set(true);

@@ -1,8 +1,9 @@
-import { Component, computed, inject, signal, OnInit } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { NoteDeFraisService } from '../../services/note-de-frais';
+import { ActeurCourant } from '../../services/acteur-courant';
 import { NoteDeFrais, ProblemDetail, StatutNote } from '../../models/note-de-frais';
 
 @Component({
@@ -11,12 +12,10 @@ import { NoteDeFrais, ProblemDetail, StatutNote } from '../../models/note-de-fra
   styleUrl: './liste-notes.css',
   templateUrl: './liste-notes.html',
 })
-export class ListeNotes implements OnInit {
+export class ListeNotes {
 
   private readonly service = inject(NoteDeFraisService);
-
-  /** Collaborateur de démo, inséré par Liquibase au 1er démarrage */
-  private readonly collaborateurId = '22222222-2222-2222-2222-222222222222';
+  protected readonly acteurCourant = inject(ActeurCourant);
 
   protected readonly notes = signal<NoteDeFrais[]>([]);
   protected readonly chargement = signal(false);
@@ -31,15 +30,29 @@ export class ListeNotes implements OnInit {
 
   protected readonly aDesNotes = computed(() => this.notes().length > 0);
 
-  ngOnInit(): void {
-    this.charger();
+  constructor() {
+    /**
+     * Recharge la liste à chaque changement d'acteur, y compris au
+     * premier chargement : l'acteur vaut null tant que l'API n'a pas répondu
+     */
+    effect(() => {
+      const acteur = this.acteurCourant.acteur();
+      if (acteur) {
+        this.charger(acteur.id);
+      }
+    });
   }
 
-  protected charger(): void {
+  protected charger(collaborateurId?: string): void {
+    const id = collaborateurId ?? this.acteurCourant.acteur()?.id;
+    if (!id) {
+      return;
+    }
+
     this.chargement.set(true);
     this.erreur.set(null);
 
-    this.service.lister(this.collaborateurId).subscribe({
+    this.service.lister(id).subscribe({
       next: notes => {
         this.notes.set(notes);
         this.chargement.set(false);
@@ -52,12 +65,17 @@ export class ListeNotes implements OnInit {
   }
 
   protected creerNote(): void {
+    const acteur = this.acteurCourant.acteur();
+    if (!acteur) {
+      return;
+    }
+
     const maintenant = new Date();
     this.chargement.set(true);
     this.erreur.set(null);
 
     this.service.creer({
-      collaborateurId: this.collaborateurId,
+      collaborateurId: acteur.id,
       annee: maintenant.getFullYear(),
       mois: maintenant.getMonth() + 1
     }).subscribe({
