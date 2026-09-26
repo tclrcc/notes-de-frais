@@ -5,9 +5,9 @@ import fr.coloricchio.notesdefrais.domain.model.*;
 import java.time.LocalDate;
 import java.time.YearMonth;
 
-final class NoteDeFraisMapper {
+final class PersistenceMapper {
 
-    private NoteDeFraisMapper() {}
+    private PersistenceMapper() {}
 
     static CategorieDepense versDomaine(CategorieDepenseEntity e) {
         return new CategorieDepense(

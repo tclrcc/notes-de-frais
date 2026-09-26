@@ -15,7 +15,7 @@ public class GenerateurReferenceAdapter implements GenerateurReference {
 
     @Override
     public String pour(Periode periode) {
-        long rang = notes.compterSurPeriode(NoteDeFraisMapper.versColonne(periode)) + 1;
+        long rang = notes.compterSurPeriode(PersistenceMapper.versColonne(periode)) + 1;
         return "NDF-%d-%02d-%03d".formatted(
                 periode.valeur().getYear(), periode.valeur().getMonthValue(), rang);
     }

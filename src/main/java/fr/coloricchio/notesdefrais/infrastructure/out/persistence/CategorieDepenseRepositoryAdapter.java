@@ -18,13 +18,13 @@ public class CategorieDepenseRepositoryAdapter implements CategorieDepenseReposi
 
     @Override
     public Optional<CategorieDepense> parCode(String code) {
-        return jpa.findByCode(code).map(NoteDeFraisMapper::versDomaine);
+        return jpa.findByCode(code).map(PersistenceMapper::versDomaine);
     }
 
     @Override
     public List<CategorieDepense> toutes() {
         return jpa.findAll().stream()
-                .map(NoteDeFraisMapper::versDomaine)
+                .map(PersistenceMapper::versDomaine)
                 .toList();
     }
 }

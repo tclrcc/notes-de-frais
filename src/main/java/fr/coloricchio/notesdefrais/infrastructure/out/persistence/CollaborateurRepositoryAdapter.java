@@ -22,13 +22,13 @@ public class CollaborateurRepositoryAdapter implements CollaborateurRepository {
 
     @Override
     public Optional<Collaborateur> parId(UUID id) {
-        return jpa.findById(id).map(NoteDeFraisMapper::versDomaine);
+        return jpa.findById(id).map(PersistenceMapper::versDomaine);
     }
 
     @Override
     public List<Collaborateur> tous() {
         return jpa.findAll(PAR_NOM).stream()
-                .map(NoteDeFraisMapper::versDomaine)
+                .map(PersistenceMapper::versDomaine)
                 .toList();
     }
 }

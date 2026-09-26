@@ -24,13 +24,13 @@ public class NoteDeFraisRepositoryAdapter implements NoteDeFraisRepository {
 
     @Override
     public Optional<NoteDeFrais> parId(UUID id) {
-        return notes.findWithLignesById(id).map(NoteDeFraisMapper::versDomaine);
+        return notes.findWithLignesById(id).map(PersistenceMapper::versDomaine);
     }
 
     @Override
     public List<NoteDeFrais> parCollaborateur(UUID collaborateurId) {
         return notes.findByCollaborateurId(collaborateurId).stream()
-                .map(NoteDeFraisMapper::versDomaine)
+                .map(PersistenceMapper::versDomaine)
                 .toList();
     }
 
@@ -39,7 +39,7 @@ public class NoteDeFraisRepositoryAdapter implements NoteDeFraisRepository {
         NoteDeFraisEntity entite = notes.findWithLignesById(note.id())
                 .orElseGet(() -> new NoteDeFraisEntity(
                         note.id(), note.reference(), note.collaborateurId(),
-                        note.statut().name(), NoteDeFraisMapper.versColonne(note.periode()),
+                        note.statut().name(), PersistenceMapper.versColonne(note.periode()),
                         note.montantTotal().valeur(), note.creeeLe(), note.soumiseLe()));
 
         entite.mettreAJour(note.statut().name(), note.montantTotal().valeur(), note.soumiseLe());
