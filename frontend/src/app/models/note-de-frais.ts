@@ -5,6 +5,18 @@ export type StatutNote =
   | 'REJETEE'
   | 'REMBOURSEE';
 
+export type RoleCollaborateur = 'COLLABORATEUR' | 'MANAGER' | 'COMPTABLE';
+
+export interface Collaborateur {
+  readonly id: string;
+  readonly nom: string;
+  readonly prenom: string;
+  readonly nomComplet: string;
+  readonly email: string;
+  readonly role: RoleCollaborateur;
+  readonly managerId: string | null;
+}
+
 export interface LigneDeFrais {
   readonly id: string;
   readonly categorie: string;

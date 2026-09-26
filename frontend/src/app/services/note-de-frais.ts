@@ -2,14 +2,14 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import {
-  NoteDeFrais, CreerNoteRequest, AjouterLigneRequest, CategorieDepense
+  NoteDeFrais, CreerNoteRequest, AjouterLigneRequest, CategorieDepense, Collaborateur
 } from '../models/note-de-frais';
 
 @Injectable({ providedIn: 'root' })
 export class NoteDeFraisService {
 
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = 'http://localhost:8080/api/notes-de-frais';
+  private readonly baseUrl = '/api/notes-de-frais';
 
   lister(collaborateurId: string): Observable<NoteDeFrais[]> {
     return this.http.get<NoteDeFrais[]>(this.baseUrl, { params: { collaborateurId } });
@@ -44,6 +44,10 @@ export class NoteDeFraisService {
   }
 
   listerCategories(): Observable<CategorieDepense[]> {
-    return this.http.get<CategorieDepense[]>('http://localhost:8080/api/categories');
+    return this.http.get<CategorieDepense[]>('/api/categories');
+  }
+
+  listerCollaborateurs(): Observable<Collaborateur[]> {
+    return this.http.get<Collaborateur[]>('/api/collaborateurs');
   }
 }
