@@ -1,0 +1,26 @@
+.entete {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: .9rem 1.5rem;
+  background: #fff;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.titre {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #0e6e72;
+  text-decoration: none;
+}
+
+.titre:hover {
+  text-decoration: underline;
+}
+
+.contenu {
+  padding: 1.5rem;
+  max-width: 68rem;
+  margin: 0 auto;
+}

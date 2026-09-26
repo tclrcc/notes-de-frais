@@ -1,0 +1,12 @@
+@if (acteurCourant.acteur(); as acteur) {
+  <div class="selecteur">
+    <label for="acteur">Connecté en tant que</label>
+    <select id="acteur" (change)="changer($event)">
+      @for (candidat of acteurCourant.disponibles(); track candidat.id) {
+        <option [value]="candidat.id" [selected]="candidat.id === acteur.id">
+          {{ candidat.nomComplet }} - {{ libelleRole(candidat.role) }}
+        </option>
+      }
+    </select>
+  </div>
+}

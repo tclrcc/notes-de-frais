@@ -1,0 +1,24 @@
+.selecteur {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+
+label {
+  font-size: .85rem;
+  color: #666;
+}
+
+select {
+  padding: .35rem .5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: .85rem;
+  background: #fff;
+}
+
+select:focus {
+  outline: 2px solid #0e6e72;
+  outline-offset: -1px;
+}
